@@ -1,6 +1,25 @@
+import { BeforeChangeHook } from "payload/dist/globals/config/types"
 import { PRODUCT_CATEGORIES } from "../../config"
-import { CollectionConfig } from "payload/types"
-import { number } from "zod"
+import { CollectionBeforeChangeHook, CollectionConfig } from "payload/types"
+import { Product } from "../../payload-types"
+import { stripe } from "../../lib/stripe"
+
+const addUser: CollectionBeforeChangeHook = async ({ req, data }) => {
+    const user = req.user
+    const productData = data as Product
+
+    return { ...productData, user: user.id }
+}
+
+// error handling that wasn't in video - og version below
+// const addUser: BeforeChangeHook<Product> = async ({
+//     req,
+//     data,
+//   }) => {
+//     const user = req.user
+
+//     return { ...data, user: user.id }
+//   }
 
 export const Products: CollectionConfig = {
     slug: "products",
@@ -8,6 +27,53 @@ export const Products: CollectionConfig = {
         useAsTitle: "name",
     },
     access: {},
+    hooks: {
+        beforeChange: [
+            addUser,
+            async args => {
+                if (args.operation === "create") {
+                    const data = args.data as Product
+
+                    // creates a product within stripe (rather than manually in their dashboard)
+                    const createdProduct = await stripe.products.create({
+                        // add same name of product as in DB
+                        name: data.name,
+                        default_price_data: {
+                            currency: "GBP",
+                            unit_amount: Math.round(data.price * 100),
+                        },
+                    })
+
+                    // collect the stripe info to add to DB for that product
+                    const updated: Product = {
+                        ...data,
+                        stripeId: createdProduct.id,
+                        priceId: createdProduct.default_price as string,
+                    }
+
+                    return updated
+                } else if (args.operation === "update") {
+                    const data = args.data as Product
+
+                    // update product in stripe
+                    const updatedProduct = await stripe.products.update(data.stripeId!, {
+                        name: data.name,
+                        default_price: data.priceId!,
+                    })
+                    // ! means we know the variable will exist
+
+                    // collect the stripe info to add to DB for that product
+                    const updated: Product = {
+                        ...data,
+                        stripeId: updatedProduct.id,
+                        priceId: updatedProduct.default_price as string,
+                    }
+
+                    return updated
+                }
+            },
+        ],
+    },
     fields: [
         {
             name: "user",
