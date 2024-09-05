@@ -53,7 +53,7 @@ const Page = () => {
 
                         {isMounted && items.length === 0 ? (
                             <div className="flex h-full flex-col items-center justify-center space-y-1">
-                                <div aria-label="true" className="relative mb-4 h-40 w-40 text-muted-foreground">
+                                <div aria-hidden="true" className="relative mb-4 h-40 w-40 text-muted-foreground">
                                     <Image src="/hippo-empty-cart.png" fill loading="eager" alt="Empty shopping cart hippo" />
                                 </div>
                                 <h3 className="font-semibold text-2xl">Your cart is empty</h3>

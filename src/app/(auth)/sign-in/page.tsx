@@ -86,7 +86,7 @@ const Page = () => {
                                 className: "gap-1.5",
                             })}
                         >
-                            Don't have an account?
+                            Don&apos;t have an account?
                             <ArrowRight className="h-4 w-4" />
                         </Link>
                     </div>
@@ -124,7 +124,7 @@ const Page = () => {
                         </form>
 
                         <div className="relative">
-                            <div aria-label="true" className="absolute inset-0 flex items-center">
+                            <div aria-hidden="true" className="absolute inset-0 flex items-center">
                                 <span className="w-full border-t" />
                             </div>
                             <div className="relative flex justify-center text-xs uppercase">

@@ -8,6 +8,7 @@ import ImageSlider from "@/components/ImageSlider"
 import MaxWidthWrapper from "@/components/MaxWidthWrapper"
 import ProductReel from "@/components/ProductReel"
 import AddToCartButton from "@/components/AddToCartButton"
+import type { Product } from "@/payload-types"
 
 interface PageProps {
     params: {
@@ -37,13 +38,26 @@ const Page = async ({ params }: PageProps) => {
         },
     })
 
-    const [product] = products
+    // Convert to unknown first
+    const productsAsUnknown = products as unknown as Product[]
+
+    // Then get the product
+    const product = productsAsUnknown[0]
+
+    // if (products.length === 0) return notFound();
+    // const product = products[0] as Product;
+
+    // const product = (products as Product[])[0];
+    // const [product] = products as Product[];
+
+    // const [(product as Product)] = products
+    // const [product]: [Product | undefined] = products
 
     if (!product) return notFound()
 
     const label = PRODUCT_CATEGORIES.find(({ value }) => value === product?.category)?.label
 
-    const validUrls = product.images.map(({ image }) => (typeof image === "string" ? image : image.url)).filter(Boolean) as string[]
+    const validUrls = (product.images as Array<{ image: string | { url: string } }>).map(({ image }) => (typeof image === "string" ? image : image.url)).filter(Boolean) as string[]
 
     return (
         <MaxWidthWrapper className="bg-white">

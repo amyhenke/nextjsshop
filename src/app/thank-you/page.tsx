@@ -4,10 +4,13 @@ import { cookies } from "next/headers"
 import payload from "payload"
 import { getPayloadClient } from "@/get-payload"
 import { notFound, redirect } from "next/navigation"
-import { Product, ProductFile, User } from "@/payload-types"
+import { Order, Product, ProductFile, User } from "@/payload-types"
 import { PRODUCT_CATEGORIES } from "@/config"
 import { formatPrice } from "@/lib/utils"
 import Link from "next/link"
+import PaymentStatus from "@/components/PaymentStatus"
+
+// This is a server side component so can perform server side validation and actions so not rendered unless user is logged and it is their order. Logic done securely. No content flashing
 
 interface PageProps {
     searchParams: { [key: string]: string | string[] | undefined }
@@ -40,7 +43,7 @@ const ThankYouPage = async ({ searchParams }: PageProps) => {
     // find id of user who made the order
     // if string then its id of user
     // otherwise will be entire user object, return so get id
-    const orderUserId: string | User = typeof order.user === "string" ? order.user : order.user.id
+    const orderUserId: string | User = typeof order.user === "string" ? order.user : (order.user as User).id
 
     // if logged in user id is not same as order user id then not authorised to download
     if (orderUserId !== user?.id) {
@@ -65,7 +68,7 @@ const ThankYouPage = async ({ searchParams }: PageProps) => {
                     <h1 className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">Thanks for ordering</h1>
 
                     {/* if order successful, payment made and logged in */}
-                    {order._isPaid ? <p className="mt-2 text-base text-muted-foreground">Your order was processed and your assets are available to download below. We&apos;ve sent your receipt and order details to {typeof order.user !== "string" ? <span className="font-medium text-gray-900">{order.user.email}</span> : null}</p> : <p className="mt-2 text-base text-muted-foreground">We appreciate your order, and we&apos;re currently processing it. So hang tight and we&apos;ll send you confirmation very soon!</p>}
+                    {order._isPaid ? <p className="mt-2 text-base text-muted-foreground">Your order was processed and your assets are available to download below. We&apos;ve sent your receipt and order details to {typeof order.user !== "string" ? <span className="font-medium text-gray-900">{(order.user as User).email}</span> : null}</p> : <p className="mt-2 text-base text-muted-foreground">We appreciate your order, and we&apos;re currently processing it. So hang tight and we&apos;ll send you confirmation very soon!</p>}
 
                     <div className="mt-16 text-sm font-medium">
                         <div className="text-muted-foreground">Order no:</div>
@@ -117,6 +120,9 @@ const ThankYouPage = async ({ searchParams }: PageProps) => {
                             <p className="text-gray-900">{formatPrice(orderTotal + 1)}</p>
                         </div>
                     </div>
+
+                    <PaymentStatus isPaid={order._isPaid as boolean} orderEmail={(order.user as User).email} orderId={order.id as string} />
+
                     <div className="mt-16 border-t border-gray-200 py-7 text-right">
                         <Link href="/products" className="text-sm font-medium text-blue-600 hover:text-blue-500">
                             Continue shopping &rarr;

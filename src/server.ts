@@ -5,6 +5,11 @@ import payload from "payload"
 import * as trpcExpress from "@trpc/server/adapters/express"
 import { appRouter } from "./trpc"
 import { inferAsyncReturnType } from "@trpc/server"
+import bodyParser from "body-parser"
+import { IncomingMessage } from "http"
+import { stripeWebhookHandler } from "./webhooks"
+import nextBuild from "next/dist/build"
+import path from "path"
 
 require("dotenv").config()
 
@@ -18,9 +23,20 @@ const createContext = ({ req, res }: trpcExpress.CreateExpressContextOptions) =>
 
 export type ExpressContext = inferAsyncReturnType<typeof createContext>
 
+// slightly modified request to make it readable and check if message comes from stripe (will have a signature to make sure its from stripe, not just anyone)
+// get IncomingMessage from http
+export type WebhookRequest = IncomingMessage & { rawBody: Buffer }
+
 const start = async () => {
-    // const payload =
-    await getPayloadClient({
+    const webhookMiddleware = bodyParser.json({
+        verify: (req: WebhookRequest, _, buffer) => {
+            req.rawBody = buffer
+        },
+    })
+
+    app.post("/api/webhooks/stripe", webhookMiddleware, stripeWebhookHandler)
+
+    const payload = await getPayloadClient({
         initOptions: {
             express: app,
             onInit: async cms => {
@@ -35,6 +51,19 @@ const start = async () => {
     //     secret: process.env.PAYLOAD_SECRET!,
     //     express: app,
     // })
+
+    if (process.env.NEXT_BUILD) {
+        app.listen(PORT, async () => {
+            payload.logger.info("Node.js is building for production")
+
+            // @ts-expect-error
+            await nextBuild(path.join(__dirname, `../`))
+
+            process.exit()
+        })
+
+        return
+    }
 
     app.use(
         "/api/trpc",
