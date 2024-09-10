@@ -1,7 +1,7 @@
-import { BeforeChangeHook } from "payload/dist/globals/config/types"
+import { AfterChangeHook, BeforeChangeHook } from "payload/dist/globals/config/types"
 import { PRODUCT_CATEGORIES } from "../../config"
-import { CollectionBeforeChangeHook, CollectionConfig } from "payload/types"
-import { Product } from "../../payload-types"
+import { CollectionBeforeChangeHook, CollectionAfterChangeHook, CollectionConfig, Access } from "payload/types"
+import { Product, User } from "../../payload-types"
 import { stripe } from "../../lib/stripe"
 
 const addUser: CollectionBeforeChangeHook = async ({ req, data }) => {
@@ -9,6 +9,36 @@ const addUser: CollectionBeforeChangeHook = async ({ req, data }) => {
     const productData = data as Product
 
     return { ...productData, user: user.id }
+}
+
+// synchronised a user to the products once a product is created
+// when a product is create this is how we know which user it belongs to
+const syncUser: CollectionAfterChangeHook<Product> = async ({ req, doc }) => {
+    const fullUser = await req.payload.findByID({
+        collection: "users",
+        id: req.user.id,
+    })
+
+    if (fullUser && typeof fullUser === "object") {
+        const { products } = fullUser
+
+        // list all IDs of products user currently has
+        // if object, its product object so get id, else its already the product id
+        // empty array means user doesn't have any products yet
+        const allIDs = [...(products?.map(product => (typeof product === "object" ? product.id : product)) || [])]
+
+        const createProductIDs = allIDs.filter((id, index) => allIDs.indexOf(id) === index)
+
+        const dataToUpdate = [...createProductIDs, doc.id]
+
+        await req.payload.update({
+            collection: "users",
+            id: fullUser.id,
+            data: {
+                products: dataToUpdate,
+            },
+        })
+    }
 }
 
 // error handling that wasn't in video - og version below
@@ -21,13 +51,47 @@ const addUser: CollectionBeforeChangeHook = async ({ req, data }) => {
 //     return { ...data, user: user.id }
 //   }
 
+const isAdminOrHasAccess =
+    (): Access =>
+    ({ req: { user: _user } }) => {
+        const user = _user as User | undefined
+
+        if (!user) return false
+        if (user.role === "admin") return true
+
+        const userProductIDs = (user.products || []).reduce<Array<string>>((accumulator, product) => {
+            if (!product) return accumulator
+
+            // just the product id
+            if (typeof product === "string") {
+                // so add id into accumulator
+                accumulator.push(product)
+            } else {
+                accumulator.push(product.id)
+            }
+            return accumulator
+        }, [])
+
+        // only see our own products
+        return {
+            id: {
+                in: userProductIDs,
+            },
+        }
+    }
+
 export const Products: CollectionConfig = {
     slug: "products",
     admin: {
         useAsTitle: "name",
     },
-    access: {},
+    access: {
+        read: isAdminOrHasAccess(),
+        update: isAdminOrHasAccess(),
+        delete: isAdminOrHasAccess(),
+    },
     hooks: {
+        afterChange: [syncUser],
         beforeChange: [
             addUser,
             async args => {
