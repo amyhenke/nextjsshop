@@ -9,7 +9,16 @@ const nextConfig = {
         //         protocol: "http",
         //     },
         // ],
-        domains: ["localhost", "https://nextjsshop-production.up.railway.app/"],
+        remotePatterns: [
+            {
+                protocol: "http",
+                hostname: "localhost",
+            },
+            {
+                protocol: "https",
+                hostname: "nextjsshop-production.up.railway.app",
+            },
+        ],
     },
 }
 
