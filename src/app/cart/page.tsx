@@ -34,7 +34,7 @@ const Page = () => {
         // only run once with , []
     }, [])
 
-    const cartTotal = items.reduce((total, { product }) => (total = product.price), 0)
+    const cartTotal = items.reduce((total, { product }) => total + product.price, 0)
 
     const fee = 1
 

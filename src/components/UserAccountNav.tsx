@@ -13,7 +13,7 @@ const UserAccountNav = ({ user }: { user: User }) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild className="overflow-visible">
-                <Button variant="ghost" size="sm" className="relative">
+                <Button variant="ghost" size="sm" className="relative hidden lg:flex">
                     My account
                 </Button>
             </DropdownMenuTrigger>
