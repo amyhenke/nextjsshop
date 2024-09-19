@@ -59,10 +59,12 @@ const start = async () => {
     const cartRouter = express.Router()
     // middleware
     cartRouter.use(payload.authenticate)
+
     cartRouter.get("/", (req, res) => {
         const request = req as PayloadRequest
 
         if (!request.user) return res.redirect("/sign-in?origin=cart")
+        console.log(request.user)
 
         const parsedUrl = parse(req.url, true)
 
