@@ -64,6 +64,8 @@ const start = async () => {
         const request = req as PayloadRequest
 
         if (!request.user) return res.redirect("/sign-in?origin=cart")
+
+        // REMOVE FROM DEPLOYED VERSION
         console.log(request.user)
 
         const parsedUrl = parse(req.url, true)

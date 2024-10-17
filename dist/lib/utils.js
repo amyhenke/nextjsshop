@@ -1,7 +1,19 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cn = cn;
 exports.formatPrice = formatPrice;
+exports.constructMetadata = constructMetadata;
 var clsx_1 = require("clsx");
 var tailwind_merge_1 = require("tailwind-merge");
 function cn() {
@@ -21,4 +33,27 @@ function formatPrice(price, options) {
         notation: notation,
         maximumFractionDigits: 2,
     }).format(numericPrice);
+}
+function constructMetadata(_a) {
+    var _b = _a === void 0 ? {} : _a, _c = _b.title, title = _c === void 0 ? "Digital Assets - the marketplace for digital assets" : _c, _d = _b.description, description = _d === void 0 ? "Digital Assets is an open-source marketplace for high-quality digital goods." : _d, _e = _b.image, image = _e === void 0 ? "/thumbnail.png" : _e, _f = _b.icons, icons = _f === void 0 ? "/favicon.ico" : _f, _g = _b.noIndex, noIndex = _g === void 0 ? false : _g;
+    return __assign({ title: title, description: description, openGraph: {
+            title: title,
+            description: description,
+            images: [
+                {
+                    url: image,
+                },
+            ],
+        }, twitter: {
+            card: "summary_large_image",
+            title: title,
+            description: description,
+            images: [image],
+            creator: "@joshtriedcoding",
+        }, icons: icons, metadataBase: new URL("https://nextjsshop-production.up.railway.app/") }, (noIndex && {
+        robots: {
+            index: false,
+            follow: false,
+        },
+    }));
 }

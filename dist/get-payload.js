@@ -103,9 +103,10 @@ var getPayloadClient = function () {
                     if (!cached.promise) {
                         cached.promise = payload_1.default.init(__assign({ email: {
                                 transport: transporter,
-                                fromAddress: "delivered@resend.dev",
+                                fromAddress: "admin@amyhenke.com",
+                                //"delivered@resend.dev",
                                 // codingamy@gmail.com
-                                fromName: "DigitalHippo",
+                                fromName: "Digital Assets",
                             }, secret: process.env.PAYLOAD_SECRET, local: (initOptions === null || initOptions === void 0 ? void 0 : initOptions.express) ? false : true }, (initOptions || {})));
                     }
                     _d.label = 1;

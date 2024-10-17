@@ -22,13 +22,13 @@ export const ReceiptEmail = ({ email, date, orderId, products }: ReceiptEmailPro
         // react email template google search
         <Html>
             <Head />
-            <Preview>Your DigitalHippo Receipt</Preview>
+            <Preview>Your Digital Assets Receipt</Preview>
 
             <Body style={main}>
                 <Container style={container}>
                     <Section>
                         <Column>
-                            <Img src={`${process.env.NEXT_PUBLIC_SERVER_URL}/hippo-email-sent.png`} width="100" height="100" alt="DigitalHippo" />
+                            <Img src={`${process.env.NEXT_PUBLIC_SERVER_URL}/hippo-email-sent.png`} width="100" height="100" alt="Digital Assets" />
                         </Column>
 
                         <Column align="right" style={tableCell}>
@@ -116,7 +116,7 @@ export const ReceiptEmail = ({ email, date, orderId, products }: ReceiptEmailPro
                         <Link href="#">Account Settings</Link> • <Link href="#">Terms of Sale</Link> • <Link href="#">Privacy Policy </Link>
                     </Text>
                     <Text style={footerCopyright}>
-                        Copyright © 2023 DigitalHippo Inc. <br /> <Link href="#">All rights reserved</Link>
+                        Copyright © 2024 Digital Assets Inc. <br /> <Link href="#">All rights reserved</Link>
                     </Text>
                 </Container>
             </Body>

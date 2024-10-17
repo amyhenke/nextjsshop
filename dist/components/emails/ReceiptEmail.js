@@ -48,12 +48,12 @@ var ReceiptEmail = function (_a) {
     // react email template google search
     React.createElement(components_1.Html, null,
         React.createElement(components_1.Head, null),
-        React.createElement(components_1.Preview, null, "Your DigitalHippo Receipt"),
+        React.createElement(components_1.Preview, null, "Your Digital Assets Receipt"),
         React.createElement(components_1.Body, { style: main },
             React.createElement(components_1.Container, { style: container },
                 React.createElement(components_1.Section, null,
                     React.createElement(components_1.Column, null,
-                        React.createElement(components_1.Img, { src: "".concat(process.env.NEXT_PUBLIC_SERVER_URL, "/hippo-email-sent.png"), width: "100", height: "100", alt: "DigitalHippo" })),
+                        React.createElement(components_1.Img, { src: "".concat(process.env.NEXT_PUBLIC_SERVER_URL, "/hippo-email-sent.png"), width: "100", height: "100", alt: "Digital Assets" })),
                     React.createElement(components_1.Column, { align: "right", style: tableCell },
                         React.createElement(components_1.Text, { style: heading }, "Receipt"))),
                 React.createElement(components_1.Section, { style: informationTable },
@@ -102,7 +102,7 @@ var ReceiptEmail = function (_a) {
                     " \u2022 ",
                     React.createElement(components_1.Link, { href: "#" }, "Privacy Policy ")),
                 React.createElement(components_1.Text, { style: footerCopyright },
-                    "Copyright \u00A9 2023 DigitalHippo Inc. ",
+                    "Copyright \u00A9 2024 Digital Assets Inc. ",
                     React.createElement("br", null),
                     " ",
                     React.createElement(components_1.Link, { href: "#" }, "All rights reserved"))))));
